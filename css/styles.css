@@ -3,7 +3,7 @@
 
 :root {
   --bg-color: #fdfdfd;
-  --surface-1: #cfcfcf;
+  --surface-1: #f0d6d6;
   --primary:   #ff2058;
   --secondary: #00e0ff;
   --text:      #000000;
@@ -44,7 +44,7 @@ form {
 }
 
 h1 {
-  font-size: 2rem;
+  font-size: 1.4rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 0.25rem;
