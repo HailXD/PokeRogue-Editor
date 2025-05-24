@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>PokeRogue Save Converter</title>
+        <title>PokeRogue Editor</title>
         <meta name="robots" content="index, follow" />
         <meta name="author" content="Your Name" />
         <meta
@@ -120,6 +120,10 @@
                 background: var(--secondary);
             }
 
+            button:nth-of-type(3) {
+                background: #b6ff00;
+            }
+
             button:active {
                 transform: translate(
                     var(--shadow-offset),
@@ -153,111 +157,168 @@
                 <button type="button" id="decryptBtn">
                     Decrypt and Download
                 </button>
+                <button type="button" id="healBtn">
+                    Heal Up
+                </button>
             </fieldset>
         </form>
         <script src="js/cryptography-js.min.js"></script>
         <script>
+            const AES_KEY = "x0i2O7WRiANTqPmZ";
+
             window.onload = function () {
+                const fileInput = document.getElementById("file");
+
                 document
                     .getElementById("decryptBtn")
                     .addEventListener("click", function () {
-                        const fileInput = document.getElementById("file");
-                        const file = fileInput.files[0];
-
-                        if (!file) {
-                            alert("Please select a file.");
-                            return;
-                        }
-
-                        const reader = new FileReader();
-                        reader.onload = function (event) {
-                            const fileContent = event.target.result;
-
-                            try {
-                                const decrypted = CryptoJS.AES.decrypt(
-                                    fileContent,
-                                    "x0i2O7WRiANTqPmZ"
-                                );
-                                const plaintext = decrypted.toString(
-                                    CryptoJS.enc.Utf8
-                                );
-
-                                const jsonContent = JSON.parse(plaintext);
-
-                                const blob = new Blob(
-                                    [JSON.stringify(jsonContent, null, 2)],
-                                    { type: "application/json" }
-                                );
-
-                                const filename = file.name.startsWith("data")
-                                    ? "data_Guest.json"
-                                    : file.name.startsWith("sessionData")
-                                    ? "sessionData_Guest.json"
-                                    : "decrypted_data.json";
-
-                                const downloadLink =
-                                    document.createElement("a");
-                                downloadLink.href =
-                                    window.URL.createObjectURL(blob);
-                                downloadLink.download = filename;
-                                downloadLink.click();
-                            } catch (e) {
-                                alert(
-                                    "Error: Failed to decrypt or parse JSON."
-                                );
-                            }
-                        };
-
-                        reader.readAsText(file);
+                        handleDecrypt(fileInput.files[0]);
                     });
 
                 document
                     .getElementById("encryptBtn")
                     .addEventListener("click", function () {
-                        const fileInput = document.getElementById("file");
-                        const file = fileInput.files[0];
+                        handleEncrypt(fileInput.files[0]);
+                    });
 
-                        if (!file) {
-                            alert("Please select a file.");
-                            return;
-                        }
-
-                        const reader = new FileReader();
-                        reader.onload = function (event) {
-                            const fileContent = event.target.result;
-
-                            try {
-                                const ciphertext = CryptoJS.AES.encrypt(
-                                    CryptoJS.enc.Latin1.parse(fileContent),
-                                    "x0i2O7WRiANTqPmZ"
-                                ).toString();
-
-                                const blob = new Blob([ciphertext], {
-                                    type: "application/octet-stream",
-                                });
-
-                                const extension = file.name.endsWith(".json")
-                                    ? "prsv"
-                                    : "json";
-                                const filename = file.name.replace(
-                                    /\.[^/.]+$/,
-                                    `.${extension}`
-                                );
-
-                                const downloadLink =
-                                    document.createElement("a");
-                                downloadLink.href =
-                                    window.URL.createObjectURL(blob);
-                                downloadLink.download = filename;
-                                downloadLink.click();
-                            } catch (e) {
-                                alert("Error: Failed to encrypt.");
-                            }
-                        };
-
-                        reader.readAsBinaryString(file);
+                document
+                    .getElementById("healBtn")
+                    .addEventListener("click", function () {
+                        handleHeal(fileInput.files[0]);
                     });
             };
+
+            function downloadBlob(blob, filename) {
+                const link = document.createElement("a");
+                link.href = window.URL.createObjectURL(blob);
+                link.download = filename;
+                link.click();
+            }
+
+            function showError(msg) {
+                alert(msg);
+                console.error(msg);
+            }
+
+            function decryptText(ciphertext) {
+                const decrypted = CryptoJS.AES.decrypt(ciphertext, AES_KEY);
+                return decrypted.toString(CryptoJS.enc.Utf8);
+            }
+
+            function encryptText(plaintext) {
+                return CryptoJS.AES.encrypt(
+                    CryptoJS.enc.Latin1.parse(plaintext),
+                    AES_KEY
+                ).toString();
+            }
+
+            function handleDecrypt(file) {
+                if (!file) {
+                    showError("Please select a file.");
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    try {
+                        const plaintext = decryptText(event.target.result);
+                        const jsonContent = JSON.parse(plaintext);
+                        const blob = new Blob([
+                            JSON.stringify(jsonContent, null, 2),
+                        ], {
+                            type: "application/json",
+                        });
+
+                        const filename = file.name.startsWith("data")
+                            ? "data_Guest.json"
+                            : file.name.startsWith("sessionData")
+                            ? "sessionData_Guest.json"
+                            : "decrypted_data.json";
+
+                        downloadBlob(blob, filename);
+                    } catch (e) {
+                        showError("Error: Failed to decrypt or parse JSON.");
+                    }
+                };
+
+                reader.readAsText(file);
+            }
+
+            function handleEncrypt(file) {
+                if (!file) {
+                    showError("Please select a file.");
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    try {
+                        const ciphertext = encryptText(event.target.result);
+                        const blob = new Blob([ciphertext], {
+                            type: "application/octet-stream",
+                        });
+
+                        const extension = file.name.endsWith(".json")
+                            ? "prsv"
+                            : "json";
+                        const filename = file.name.replace(
+                            /\.[^/.]+$/,
+                            `.${extension}`
+                        );
+
+                        downloadBlob(blob, filename);
+                    } catch (e) {
+                        showError("Error: Failed to encrypt.");
+                    }
+                };
+
+                reader.readAsBinaryString(file);
+            }
+
+            function handleHeal(file) {
+                if (!file) {
+                    showError("Please select a file.");
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    try {
+                        let jsonContent;
+
+                        if (file.name.endsWith(".prsv")) {
+                            const plaintext = decryptText(event.target.result);
+                            jsonContent = JSON.parse(plaintext);
+                        } else {
+                            jsonContent = JSON.parse(event.target.result);
+                        }
+
+                        if (Array.isArray(jsonContent.party)) {
+                            jsonContent.party.forEach((p) => {
+                                if (Array.isArray(p.stats) && p.stats.length) {
+                                    p.hp = p.stats[0];
+                                }
+                                p.status = null;
+                            });
+                        }
+
+                        const updatedPlain = JSON.stringify(jsonContent);
+                        const newCipher = encryptText(updatedPlain);
+                        const blob = new Blob([newCipher], {
+                            type: "application/octet-stream",
+                        });
+
+                        const baseName = file.name.replace(/\.[^/.]+$/, "");
+                        const filename = `${baseName}_HealUp.prsv`;
+
+                        downloadBlob(blob, filename);
+                    } catch (e) {
+                        showError("Error: Failed to process Heal Up operation.");
+                    }
+                };
+
+                reader.readAsText(file);
+            }
         </script>
     </body>
 </html>
