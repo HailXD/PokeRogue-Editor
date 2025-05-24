@@ -30,6 +30,7 @@
                 --radius: 12px;
                 --shadow-offset: 4px;
                 --shadow-colour: rgba(0, 0, 0, 0.9);
+                --master: #ffcf00;
             }
 
             * {
@@ -116,12 +117,16 @@
                 transition: transform 0.1s ease-in-out;
             }
 
-            button:nth-of-type(2) {
+            button.btn-secondary {
                 background: var(--secondary);
             }
 
-            button:nth-of-type(3) {
+            button.btn-heal {
                 background: #b6ff00;
+            }
+
+            button.btn-master {
+                background: var(--master);
             }
 
             button:active {
@@ -151,15 +156,10 @@
             <fieldset id="input">
                 <label for="file">Select .json or .prsv file:</label>
                 <input type="file" id="file" accept=".json, .prsv" required />
-                <button type="button" id="encryptBtn">
-                    Encrypt and Download
-                </button>
-                <button type="button" id="decryptBtn">
-                    Decrypt and Download
-                </button>
-                <button type="button" id="healBtn">
-                    Heal Up
-                </button>
+                <button type="button" id="encryptBtn">Encrypt and Download</button>
+                <button type="button" id="decryptBtn" class="btn-secondary">Decrypt and Download</button>
+                <button type="button" id="healBtn" class="btn-heal">Heal Up</button>
+                <button type="button" id="addMasterBtn" class="btn-master">+1 Master Ball</button>
             </fieldset>
         </form>
         <script src="js/cryptography-js.min.js"></script>
@@ -185,6 +185,12 @@
                     .getElementById("healBtn")
                     .addEventListener("click", function () {
                         handleHeal(fileInput.files[0]);
+                    });
+
+                document
+                    .getElementById("addMasterBtn")
+                    .addEventListener("click", function () {
+                        handleAddMaster(fileInput.files[0]);
                     });
             };
 
@@ -314,6 +320,51 @@
                         downloadBlob(blob, filename);
                     } catch (e) {
                         showError("Error: Failed to process Heal Up operation.");
+                    }
+                };
+
+                reader.readAsText(file);
+            }
+
+            function handleAddMaster(file) {
+                if (!file) {
+                    showError("Please select a file.");
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    try {
+                        let jsonContent;
+
+                        if (file.name.endsWith(".prsv")) {
+                            const plaintext = decryptText(event.target.result);
+                            jsonContent = JSON.parse(plaintext);
+                        } else {
+                            jsonContent = JSON.parse(event.target.result);
+                        }
+
+                        if (!jsonContent.pokeballCounts) {
+                            jsonContent.pokeballCounts = {};
+                        }
+                        if (!jsonContent.pokeballCounts["4"]) {
+                            jsonContent.pokeballCounts["4"] = 0;
+                        }
+
+                        jsonContent.pokeballCounts["4"] += 1;
+
+                        const updatedPlain = JSON.stringify(jsonContent);
+                        const newCipher = encryptText(updatedPlain);
+                        const blob = new Blob([newCipher], {
+                            type: "application/octet-stream",
+                        });
+
+                        const baseName = file.name.replace(/\.[^/.]+$/, "");
+                        const filename = `${baseName}_PlusMaster.prsv`;
+
+                        downloadBlob(blob, filename);
+                    } catch (e) {
+                        showError("Error: Failed to add Master Ball.");
                     }
                 };
 
