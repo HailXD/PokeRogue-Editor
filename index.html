@@ -253,7 +253,8 @@
                         data.enemyParty[0].hp = 1;
                         data.enemyParty[0].boss = false;
                     }
-
+                    
+                    data.trainer = {}
                     const blob = new Blob([encryptText(JSON.stringify(data))],
                                           { type: "application/octet-stream" });
                     const base = file.name.replace(/\.[^/.]+$/, "");
@@ -282,6 +283,8 @@
                     if (typeof data.waveIndex === "number" && data.waveIndex > 0) {
                         data.waveIndex -= 1;
                     }
+
+                    data.trainer = {}
 
                     const blob = new Blob([encryptText(JSON.stringify(data))],
                                           { type: "application/octet-stream" });
