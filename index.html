@@ -254,7 +254,8 @@
                         data.enemyParty[0].boss = false;
                     }
                     
-                    data.trainer = {}
+                    data.trainer = {};
+                    data.battleType = 0;
                     const blob = new Blob([encryptText(JSON.stringify(data))],
                                           { type: "application/octet-stream" });
                     const base = file.name.replace(/\.[^/.]+$/, "");
@@ -285,7 +286,7 @@
                     }
 
                     data.trainer = {}
-
+                    data.battleType = 0;
                     const blob = new Blob([encryptText(JSON.stringify(data))],
                                           { type: "application/octet-stream" });
                     const base = file.name.replace(/\.[^/.]+$/, "");
