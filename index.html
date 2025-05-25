@@ -285,7 +285,7 @@
                     const blob = new Blob([encryptText(JSON.stringify(data))],
                                           { type: "application/octet-stream" });
                     const base = file.name.replace(/\.[^/.]+$/, "");
-                    downloadBlob(blob, `${base}_SkipFloorWave.prsv`);
+                    downloadBlob(blob, `${base}_Backtrack.prsv`);
                 } catch { showError("Error: Failed to process Skip Floor & Wave operation."); }
             };
             reader.readAsText(file);
