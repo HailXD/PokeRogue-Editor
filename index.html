@@ -111,6 +111,7 @@
             <button type="button" id="healBtn" class="btn-heal">Heal Up</button>
             <button type="button" id="addMasterBtn" class="btn-master">+1 Master Ball</button>
             <button type="button" id="skipFloorBtn" class="btn-skip">Skip Floor</button>
+            <button type="button" id="skipFloorWaveBtn" class="btn-skip">Backtrack</button>
         </fieldset>
     </form>
 
@@ -145,6 +146,8 @@
                 .addEventListener("click", () => handleAddMaster(fileInput.files[0]));
             document.getElementById("skipFloorBtn")
                 .addEventListener("click", () => handleSkipFloor(fileInput.files[0]));
+            document.getElementById("skipFloorWaveBtn")
+                .addEventListener("click", () => handleSkipFloorAndWave(fileInput.files[0]));
         };
 
         function handleDecrypt(file) {
@@ -247,6 +250,7 @@
                     if (Array.isArray(data.enemyParty) && data.enemyParty.length) {
                         data.enemyParty = [data.enemyParty[0]];
                         data.enemyParty[0].hp = 1;
+                        data.enemyParty[0].boss = false;
                     }
 
                     const blob = new Blob([encryptText(JSON.stringify(data))],
@@ -254,6 +258,35 @@
                     const base = file.name.replace(/\.[^/.]+$/, "");
                     downloadBlob(blob, `${base}_SkipFloor.prsv`);
                 } catch { showError("Error: Failed to process Skip Floor operation."); }
+            };
+            reader.readAsText(file);
+        }
+
+        function handleSkipFloorAndWave(file) {
+            if (!file) return showError("Please select a file.");
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    let data = file.name.endsWith(".prsv")
+                               ? JSON.parse(decryptText(e.target.result))
+                               : JSON.parse(e.target.result);
+
+                    if (Array.isArray(data.enemyParty) && data.enemyParty.length) {
+                        data.enemyParty = [data.enemyParty[0]];
+                        data.enemyParty[0].hp = 1;
+                        data.enemyParty[0].boss = false;
+                    }
+
+                    if (typeof data.waveIndex === "number" && data.waveIndex > 0) {
+                        data.waveIndex -= 1;
+                    }
+
+                    const blob = new Blob([encryptText(JSON.stringify(data))],
+                                          { type: "application/octet-stream" });
+                    const base = file.name.replace(/\.[^/.]+$/, "");
+                    downloadBlob(blob, `${base}_SkipFloorWave.prsv`);
+                } catch { showError("Error: Failed to process Skip Floor & Wave operation."); }
             };
             reader.readAsText(file);
         }
