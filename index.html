@@ -19,6 +19,7 @@
             --secondary: #00e0ff;
             --skip: #ff9f0a;
             --master: #ffcf00;
+            --rogue: #ffaaff;
             --text: #000000;
             --border: #000000;
             --radius: 12px;
@@ -83,7 +84,8 @@
         button.btn-heal      { background: #b6ff00; }
         button.btn-master    { background: var(--master); }
         button.btn-skip      { background: var(--skip); }
-        button.backtrack      { background: #ff029e; }
+        button.btn-rogue     { background: var(--rogue); }
+        button.backtrack     { background: #6a0dad; }
 
         button:active {
             transform: translate(var(--shadow-offset), var(--shadow-offset));
@@ -111,6 +113,7 @@
             <button type="button" id="decryptBtn" class="btn-secondary">Decrypt and Download</button>
             <button type="button" id="healBtn" class="btn-heal">Heal Up</button>
             <button type="button" id="addMasterBtn" class="btn-master">+1 Master Ball</button>
+            <button type="button" id="addRogueBtn" class="btn-rogue">+10 Rogue Ball</button>
             <button type="button" id="skipFloorBtn" class="btn-skip">Skip Floor</button>
             <button type="button" id="skipFloorWaveBtn" class="btn-backtrack">Backtrack</button>
         </fieldset>
@@ -145,6 +148,8 @@
                 .addEventListener("click", () => handleHeal(fileInput.files[0]));
             document.getElementById("addMasterBtn")
                 .addEventListener("click", () => handleAddMaster(fileInput.files[0]));
+            document.getElementById("addRogueBtn")
+                .addEventListener("click", () => handleAddRogue(fileInput.files[0]));
             document.getElementById("skipFloorBtn")
                 .addEventListener("click", () => handleSkipFloor(fileInput.files[0]));
             document.getElementById("skipFloorWaveBtn")
@@ -238,6 +243,28 @@
             reader.readAsText(file);
         }
 
+        function handleAddRogue(file) {
+            if (!file) return showError("Please select a file.");
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    let data = file.name.endsWith(".prsv")
+                               ? JSON.parse(decryptText(e.target.result))
+                               : JSON.parse(e.target.result);
+
+                    data.pokeballCounts ??= {};
+                    data.pokeballCounts["3"] = (data.pokeballCounts["3"] || 0) + 10;
+
+                    const blob = new Blob([encryptText(JSON.stringify(data))],
+                                          { type: "application/octet-stream" });
+                    const base = file.name.replace(/\.[^/.]+$/, "");
+                    downloadBlob(blob, `${base}_PlusRogue.prsv`);
+                } catch { showError("Error: Failed to add Rogue Balls."); }
+            };
+            reader.readAsText(file);
+        }
+
         function handleSkipFloor(file) {
             if (!file) return showError("Please select a file.");
 
@@ -251,11 +278,11 @@
                     if (Array.isArray(data.enemyParty) && data.enemyParty.length) {
                         data.enemyParty = [data.enemyParty[0]];
                         data.enemyParty[0].hp = 1;
-                        data.enemyParty[0].boss = false;
+                        // data.enemyParty[0].boss = false;
                     }
                     
-                    data.trainer = {};
-                    data.battleType = 0;
+                    // data.trainer = {};
+                    // data.battleType = 0;
                     const blob = new Blob([encryptText(JSON.stringify(data))],
                                           { type: "application/octet-stream" });
                     const base = file.name.replace(/\.[^/.]+$/, "");
@@ -278,15 +305,15 @@
                     if (Array.isArray(data.enemyParty) && data.enemyParty.length) {
                         data.enemyParty = [data.enemyParty[0]];
                         data.enemyParty[0].hp = 1;
-                        data.enemyParty[0].boss = false;
+                        // data.enemyParty[0].boss = false;
                     }
 
                     if (typeof data.waveIndex === "number" && data.waveIndex > 0) {
                         data.waveIndex -= 1;
                     }
 
-                    data.trainer = {}
-                    data.battleType = 0;
+                    // data.trainer = {}
+                    // data.battleType = 0;
                     const blob = new Blob([encryptText(JSON.stringify(data))],
                                           { type: "application/octet-stream" });
                     const base = file.name.replace(/\.[^/.]+$/, "");
