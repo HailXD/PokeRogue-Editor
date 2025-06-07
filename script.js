@@ -21,16 +21,20 @@ window.onload = () => {
         .addEventListener("click", () => handleEncrypt(fileInput.files[0]));
     document.getElementById("decryptBtn")
         .addEventListener("click", () => handleDecrypt(fileInput.files[0]));
-    document.getElementById("healBtn")
-        .addEventListener("click", () => handleHeal(fileInput.files[0]));
-    document.getElementById("addMasterBtn")
-        .addEventListener("click", () => handleAddMaster(fileInput.files[0]));
-    document.getElementById("addRogueBtn")
-        .addEventListener("click", () => handleAddRogue(fileInput.files[0]));
-    document.getElementById("skipFloorBtn")
-        .addEventListener("click", () => handleSkipFloor(fileInput.files[0]));
-    document.getElementById("skipFloorWaveBtn")
-        .addEventListener("click", () => handleSkipFloorAndWave(fileInput.files[0]));
+
+    if (window.location.pathname.includes("hail")) {
+        document.getElementById("advanced-options").style.display = "block";
+        document.getElementById("healBtn")
+            .addEventListener("click", () => handleHeal(fileInput.files[0]));
+        document.getElementById("addMasterBtn")
+            .addEventListener("click", () => handleAddMaster(fileInput.files[0]));
+        document.getElementById("addRogueBtn")
+            .addEventListener("click", () => handleAddRogue(fileInput.files[0]));
+        document.getElementById("skipFloorBtn")
+            .addEventListener("click", () => handleSkipFloor(fileInput.files[0]));
+        document.getElementById("skipFloorWaveBtn")
+            .addEventListener("click", () => handleSkipFloorAndWave(fileInput.files[0]));
+    }
 };
 
 function handleDecrypt(file) {
