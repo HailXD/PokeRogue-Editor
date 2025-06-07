@@ -159,6 +159,7 @@ function handleSkipFloor(file) {
             if (Array.isArray(data.enemyParty) && data.enemyParty.length) {
                 data.enemyParty = [data.enemyParty[0]];
                 data.enemyParty[0].hp = 1;
+                data.enemyParty[0].stats = [0, 0, 0, 0, 0, 0];
                 // data.enemyParty[0].boss = false;
             }
             
