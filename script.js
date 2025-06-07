@@ -22,7 +22,7 @@ window.onload = () => {
     document.getElementById("decryptBtn")
         .addEventListener("click", () => handleDecrypt(fileInput.files[0]));
 
-    if (window.location.pathname.includes("hail")) {
+    if (new URLSearchParams(window.location.search).has("hail")) {
         document.getElementById("advanced-options").style.display = "block";
         document.getElementById("healBtn")
             .addEventListener("click", () => handleHeal(fileInput.files[0]));
