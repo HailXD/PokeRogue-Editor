@@ -160,11 +160,11 @@ function handleSkipFloor(file) {
                 data.enemyParty = [data.enemyParty[0]];
                 data.enemyParty[0].hp = 1;
                 data.enemyParty[0].moveset = [];
-                // data.enemyParty[0].boss = false;
+                data.enemyParty[0].boss = false;
             }
             
-            // data.trainer = {};
-            // data.battleType = 0;
+            data.trainer = {};
+            data.battleType = 0;
             const blob = new Blob([encryptText(JSON.stringify(data))],
                                   { type: "application/octet-stream" });
             const base = file.name.replace(/\.[^/.]+$/, "");
@@ -187,15 +187,15 @@ function handleSkipFloorAndWave(file) {
             if (Array.isArray(data.enemyParty) && data.enemyParty.length) {
                 data.enemyParty = [data.enemyParty[0]];
                 data.enemyParty[0].hp = 1;
-                // data.enemyParty[0].boss = false;
+                data.enemyParty[0].boss = false;
             }
 
             if (typeof data.waveIndex === "number" && data.waveIndex > 0) {
                 data.waveIndex -= 1;
             }
 
-            // data.trainer = {}
-            // data.battleType = 0;
+            data.trainer = {}
+            data.battleType = 0;
             const blob = new Blob([encryptText(JSON.stringify(data))],
                                   { type: "application/octet-stream" });
             const base = file.name.replace(/\.[^/.]+$/, "");
