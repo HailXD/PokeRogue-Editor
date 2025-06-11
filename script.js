@@ -160,11 +160,11 @@ function handleSkipFloor(file) {
                 data.enemyParty = [data.enemyParty[0]];
                 data.enemyParty[0].hp = 1;
                 data.enemyParty[0].moveset = [];
-                data.enemyParty[0].boss = false;
+                // data.enemyParty[0].boss = false;
             }
             
-            data.trainer = {};
-            data.battleType = 0;
+            // data.trainer = {};
+            // data.battleType = 0;
             const blob = new Blob([encryptText(JSON.stringify(data))],
                                   { type: "application/octet-stream" });
             const base = file.name.replace(/\.[^/.]+$/, "");
